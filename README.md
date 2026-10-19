@@ -32,13 +32,34 @@ Layered Architecture: Presentation Layer → Business Layer → Data Access Laye
 
 ```
 docs/
-  PA1/   Project Definition, Project Plan, SRS
-  PA2/
-  PA3/
-diagrams/  Use case and architecture diagrams
-src/       Source code (later)
+  PA1/
+    1_Project_Definition.pdf                  Project Definition Document
+    2_Project_Plan.pdf                        Project Plan Document
+    3_Software_Requirements_Specification.pdf SRS (use cases, UML diagram, NFRs,
+                                              architecture overview, pattern mapping)
+    parts/                                    Individual sections integrated into the SRS
+      architecture_overview.pdf
+      pattern_mapping_matrix.pdf
+diagrams/
+  use_case_diagram.png                        UML use case diagram (UC1–UC4)
+  architecture_diagram.png                    Layered architecture diagram
 ```
+
+`docs/PA2`, `docs/PA3` and `src/` will be added with the next assignments.
 
 ## Deliverables
 
-- [PA1](docs/PA1) – Use Cases, Software Architecture and Pattern Mapping
+### PA1 – Use Cases, Software Architecture and Pattern Mapping
+
+| Deliverable | File |
+|---|---|
+| Project Definition Document | [1_Project_Definition.pdf](docs/PA1/1_Project_Definition.pdf) |
+| Project Plan Document | [2_Project_Plan.pdf](docs/PA1/2_Project_Plan.pdf) |
+| Software Requirements Specification | [3_Software_Requirements_Specification.pdf](docs/PA1/3_Software_Requirements_Specification.pdf) |
+| Software Architecture Overview (diagram + explanation) | SRS Section 6 · [architecture_diagram.png](diagrams/architecture_diagram.png) |
+| Pattern–Use Case Mapping Matrix | SRS Section 7 |
+| UML Use Case Diagram | SRS Section 3.1 · [use_case_diagram.png](diagrams/use_case_diagram.png) |
+
+### Traceability conventions
+
+Use cases are numbered UC1–UC4; their steps UCn-S1…, alternative flows UCn-A1… and exceptions UCn-E1…; functional requirements FR-n.m; non-functional requirements NFR-X.n; acceptance tests AT-UCn-m. The same identifiers are used in design documents, class/package names, commit messages and tests.
