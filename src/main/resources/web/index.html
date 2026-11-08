@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find a Match – Erasmus & Local Students</title>
+<style>
+  :root {
+    --bg: #f6f5fb; --panel: #ffffff; --ink: #1f2328; --muted: #5f6475; --line: #e2e0ee;
+    --accent: #5b4fc4; --accent-soft: #ecebfb; --ok: #1a7f4b; --ok-soft: #e3f4ea; --warn: #9a5b00; --warn-soft: #fff3dc;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  header { display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .uc { font-size: 12px; color: var(--muted); }
+  header .spacer { flex: 1; }
+  label.inline { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  select, button { font: inherit; }
+  select { padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  main { display: grid; grid-template-columns: 240px 1fr 300px; gap: 16px; padding: 16px 24px; max-width: 1320px; margin: 0 auto; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+  .panel h2 { font-size: 14px; margin: 0 0 10px; }
+  .criteria button { display: block; width: 100%; text-align: left; padding: 8px 10px; margin-bottom: 6px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; }
+  .criteria button.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .filters label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 3px; }
+  .filters select { width: 100%; }
+  .primary { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-weight: 600; }
+  .primary:disabled { background: #b8b3e3; cursor: default; }
+  .ghost { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+  .results-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .results-head h2 { margin: 0; }
+  .muted { color: var(--muted); font-size: 12px; }
+  .card { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; margin-bottom: 10px; }
+  .card .name { font-weight: 650; font-size: 15px; }
+  .badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); margin-left: 6px; vertical-align: 1px; }
+  .badge.local { background: #e6f1fb; color: #1d5fa8; }
+  .score { text-align: right; min-width: 110px; }
+  .score b { font-size: 20px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 4px; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .reasons { grid-column: 1 / -1; margin: 0; padding-left: 18px; color: var(--ink); }
+  .chips { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { font-size: 11px; background: #f1f0f6; border-radius: 99px; padding: 1px 8px; color: var(--muted); }
+  .desc { grid-column: 1 / -1; font-style: italic; color: var(--muted); }
+  .actions { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
+  .notice { padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); margin-bottom: 10px; }
+  .ok { background: var(--ok-soft); color: var(--ok); }
+  .side h3 { font-size: 13px; margin: 14px 0 6px; }
+  .note, .req { font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 6px; background: #fff; }
+  .req .row { display: flex; gap: 6px; margin-top: 6px; }
+  .status { font-size: 11px; font-weight: 600; }
+  .status.PENDING { color: var(--warn); } .status.CONFIRMED { color: var(--ok); } .status.REJECTED { color: var(--muted); }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+  @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1 data-i18n="title">Find a Match</h1>
+    <div class="uc">UC2 · Erasmus &amp; Local Student Matching Platform</div>
+  </div>
+  <div class="spacer"></div>
+  <label class="inline"><span data-i18n="loggedAs">Logged in as</span>
+    <select id="student"></select></label>
+  <label class="inline"><span data-i18n="language">Language</span>
+    <select id="lang"><option value="en">English</option><option value="es">Español</option><option value="tr">Türkçe</option></select></label>
+</header>
+
+<main>
+  <aside class="panel">
+    <h2 data-i18n="criterion">Matching criterion</h2>
+    <div class="criteria" id="criteria"></div>
+    <div class="filters">
+      <h2 style="margin-top:14px" data-i18n="filters">Filters</h2>
+      <label data-i18n="fLanguage">Language</label>
+      <select id="fLanguage"><option value="">–</option></select>
+      <label data-i18n="fType">Student type</label>
+      <select id="fType"><option value="" data-i18n="fTypeDefault">Opposite type (default)</option><option value="ERASMUS">Erasmus</option><option value="LOCAL">Local</option></select>
+      <label data-i18n="fDepartment">Department</label>
+      <select id="fDepartment"><option value="">–</option></select>
+      <label data-i18n="fAvailability">Availability</label>
+      <select id="fAvailability"><option value="">–</option></select>
+    </div>
+    <button class="primary" style="width:100%;margin-top:14px" id="search" data-i18n="search">Find matches</button>
+  </aside>
+
+  <section class="panel">
+    <div class="results-head"><h2 data-i18n="results">Compatible students</h2><span class="muted" id="count"></span></div>
+    <div id="results"></div>
+  </section>
+
+  <aside class="panel side">
+    <h2 data-i18n="notifications">Notifications</h2>
+    <div id="notes"></div>
+    <h3 data-i18n="received">Requests received</h3>
+    <div id="received"></div>
+    <h3 data-i18n="sent">Requests sent</h3>
+    <div id="sent"></div>
+  </aside>
+</main>
+<div id="toast"></div>
+
+<script>
+const I18N = {
+  en: { title: "Find a Match", loggedAs: "Logged in as", language: "Language", criterion: "Matching criterion", filters: "Filters",
+        fLanguage: "Language", fType: "Student type", fTypeDefault: "Opposite type (default)", fDepartment: "Department", fAvailability: "Availability",
+        search: "Find matches", results: "Compatible students", notifications: "Notifications", received: "Requests received", sent: "Requests sent",
+        send: "Send match request", pending: "Request pending", translate: "Translate", accept: "Accept", reject: "Reject",
+        none: "Nothing yet.", found: n => n + " found", requestSent: "Match request sent", accepted: "Match confirmed!", rejected: "Request rejected",
+        LANGUAGE_EXCHANGE: "Language Exchange", HOBBIES: "Hobbies", SPORTS: "Sports", contact: "Contact", PENDING: "Pending", CONFIRMED: "Matched", REJECTED: "Not accepted" },
+  es: { title: "Buscar un match", loggedAs: "Sesión de", language: "Idioma", criterion: "Criterio de emparejamiento", filters: "Filtros",
+        fLanguage: "Idioma", fType: "Tipo de estudiante", fTypeDefault: "Tipo opuesto (por defecto)", fDepartment: "Departamento", fAvailability: "Disponibilidad",
+        search: "Buscar", results: "Estudiantes compatibles", notifications: "Notificaciones", received: "Solicitudes recibidas", sent: "Solicitudes enviadas",
+        send: "Enviar solicitud", pending: "Solicitud pendiente", translate: "Traducir", accept: "Aceptar", reject: "Rechazar",
+        none: "Nada todavía.", found: n => n + " encontrados", requestSent: "Solicitud enviada", accepted: "¡Match confirmado!", rejected: "Solicitud rechazada",
+        LANGUAGE_EXCHANGE: "Intercambio de idiomas", HOBBIES: "Aficiones", SPORTS: "Deportes", contact: "Contacto", PENDING: "Pendiente", CONFIRMED: "Match confirmado", REJECTED: "No aceptada" },
+  tr: { title: "Eşleşme Bul", loggedAs: "Oturum", language: "Dil", criterion: "Eşleşme ölçütü", filters: "Filtreler",
+        fLanguage: "Dil", fType: "Öğrenci türü", fTypeDefault: "Karşı tür (varsayılan)", fDepartment: "Bölüm", fAvailability: "Uygunluk",
+        search: "Eşleşme bul", results: "Uyumlu öğrenciler", notifications: "Bildirimler", received: "Gelen istekler", sent: "Gönderilen istekler",
+        send: "Eşleşme isteği gönder", pending: "İstek beklemede", translate: "Çevir", accept: "Kabul et", reject: "Reddet",
+        none: "Henüz bir şey yok.", found: n => n + " öğrenci", requestSent: "Eşleşme isteği gönderildi", accepted: "Eşleşme onaylandı!", rejected: "İstek reddedildi",
+        LANGUAGE_EXCHANGE: "Dil Değişimi", HOBBIES: "Hobiler", SPORTS: "Spor", contact: "İletişim", PENDING: "Beklemede", CONFIRMED: "Eşleşti", REJECTED: "Kabul edilmedi" }
+};
+const $ = id => document.getElementById(id);
+const state = { students: [], criterion: "LANGUAGE_EXCHANGE", lang: localGet("lang") || "en", translations: {} };
+function localGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function localSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+const t = k => I18N[state.lang][k] ?? I18N.en[k] ?? k;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const body = await r.json();
+  if (!r.ok) throw Object.assign(new Error(body.message), { code: body.error });
+  return body;
+}
+const post = (path, data) => api(path, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(data) });
+function toast(msg) { const el = $("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2200); }
+
+function applyI18n() {
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  renderCriteria();
+}
+function renderCriteria() {
+  $("criteria").innerHTML = ["LANGUAGE_EXCHANGE", "HOBBIES", "SPORTS"].map(c =>
+    `<button data-c="${c}" class="${c === state.criterion ? "active" : ""}">${t(c)}</button>`).join("");
+  $("criteria").querySelectorAll("button").forEach(b => b.onclick = () => { state.criterion = b.dataset.c; renderCriteria(); search(); });
+}
+function fillFilters() {
+  const uniq = f => [...new Set(state.students.flatMap(f))].sort();
+  const opts = (id, values) => $(id).innerHTML = `<option value="">–</option>` + values.map(v => `<option value="${esc(v)}">${esc(cap(v))}</option>`).join("");
+  opts("fLanguage", uniq(s => [...s.speaks, ...Object.keys(s.learns)]));
+  opts("fDepartment", uniq(s => [s.department]));
+  opts("fAvailability", uniq(s => s.availability));
+}
+const me = () => $("student").value;
+
+async function search() {
+  const q = new URLSearchParams({ studentId: me(), criterion: state.criterion, language: $("fLanguage").value,
+    type: $("fType").value, department: $("fDepartment").value, availability: $("fAvailability").value });
+  try {
+    const r = await api("/api/matches?" + q);
+    $("count").textContent = t("found")(r.count);
+    $("results").innerHTML = r.message ? `<div class="notice">${esc(r.message)}</div>` : r.candidates.map(card).join("");
+    $("results").querySelectorAll("[data-send]").forEach(b => b.onclick = () => sendRequest(b.dataset.send));
+    $("results").querySelectorAll("[data-tr]").forEach(b => b.onclick = () => translate(b.dataset.tr, b));
+  } catch (e) {
+    $("count").textContent = "";
+    $("results").innerHTML = `<div class="notice">${esc(e.message)} <span class="muted">(${esc(e.code)})</span></div>`;
+  }
+}
+function card(c) {
+  const learns = Object.entries(c.learns).map(([l, lv]) => cap(l) + " " + lv);
+  return `<div class="card">
+    <div><span class="name">${esc(c.name)}</span><span class="badge ${c.type === "LOCAL" ? "local" : ""}">${c.type === "LOCAL" ? "Local" : "Erasmus"}</span>
+      <div class="muted">${esc(c.department)} · ${esc(c.speaks.map(cap).join(", "))} → ${esc(learns.join(", "))}</div></div>
+    <div class="score"><b>${c.score}</b><span class="muted"> / 100</span><div class="bar"><i style="width:${c.score}%"></i></div></div>
+    <ul class="reasons">${c.reasons.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+    <div class="chips">${[...c.hobbies, ...c.sports].map(h => `<span class="chip">${esc(h)}</span>`).join("")}</div>
+    ${c.description ? `<div class="desc" id="d-${c.id}">${descHtml(c)}</div>` : ""}
+    <div class="actions">
+      <button class="primary" data-send="${c.id}" ${c.requestStatus === "PENDING" ? "disabled" : ""}>${c.requestStatus === "PENDING" ? t("pending") : t("send")}</button>
+      ${c.description && c.descriptionLanguage !== state.lang && !state.translations[c.id + state.lang] ? `<button class="ghost" data-tr="${c.id}">${t("translate")}</button>` : ""}
+    </div></div>`;
+}
+async function sendRequest(candidateId) {
+  try { await post("/api/requests", { requesterId: me(), candidateId, criterion: state.criterion }); toast(t("requestSent")); }
+  catch (e) { toast(e.message); }
+  search(); refreshSide();
+}
+function descHtml(c) {
+  const tr = state.translations[c.id + state.lang];
+  if (!tr) return `“${esc(c.description)}”`;
+  return `“${esc(tr.text)}” <span class="muted">(${esc(c.descriptionLanguage)} → ${esc(state.lang)})</span>`;
+}
+async function translate(id, btn) {             // UC2-A2 (Adapter on the server side)
+  const r = await api(`/api/students/${id}/description?lang=${state.lang}`);
+  const s = state.students.find(x => x.id === id);
+  if (r.translated) {
+    state.translations[id + state.lang] = r;
+    $("d-" + id).innerHTML = descHtml(s);
+    btn.remove();
+  } else if (r.notice) {                        // UC2-E4: original text + notice
+    $("d-" + id).innerHTML = `“${esc(r.text)}” <span class="notice" style="display:inline-block;margin:4px 0 0;padding:2px 8px">${esc(r.notice)}</span>`;
+  }
+}
+async function answer(id, accept) {
+  try { await post(`/api/requests/${id}/${accept ? "accept" : "reject"}`, { studentId: me() }); toast(accept ? t("accepted") : t("rejected")); }
+  catch (e) { toast(e.message); }
+  refreshSide(); search();
+}
+async function refreshSide() {
+  const [notes, reqs] = await Promise.all([api("/api/notifications?studentId=" + me()), api("/api/requests?studentId=" + me())]);
+  $("notes").innerHTML = notes.length ? notes.map(n => `<div class="note">${esc(n.message)}<div class="muted">${new Date(n.createdAt).toLocaleTimeString()}</div></div>`).join("") : `<div class="muted">${t("none")}</div>`;
+  const row = r => `<div class="req"><b>${esc(r.otherName)}</b> · ${t(r.criterion)} · ${r.score}
+      <div class="status ${r.status}">${t(r.status)}${r.contact ? ` · ${t("contact")}: ${esc(r.contact)}` : ""}</div>
+      ${r.direction === "RECEIVED" && r.status === "PENDING" ? `<div class="row"><button class="primary" data-a="${r.id}">${t("accept")}</button><button class="ghost" data-r="${r.id}">${t("reject")}</button></div>` : ""}</div>`;
+  const rec = reqs.filter(r => r.direction === "RECEIVED"), snt = reqs.filter(r => r.direction === "SENT");
+  $("received").innerHTML = rec.length ? rec.map(row).join("") : `<div class="muted">${t("none")}</div>`;
+  $("sent").innerHTML = snt.length ? snt.map(row).join("") : `<div class="muted">${t("none")}</div>`;
+  document.querySelectorAll("[data-a]").forEach(b => b.onclick = () => answer(b.dataset.a, true));
+  document.querySelectorAll("[data-r]").forEach(b => b.onclick = () => answer(b.dataset.r, false));
+}
+
+(async function init() {
+  state.students = await api("/api/students");
+  $("student").innerHTML = state.students.map(s => `<option value="${s.id}">${esc(s.name)} (${s.type === "LOCAL" ? "Local" : "Erasmus"}${s.profileComplete ? "" : ", incomplete"})</option>`).join("");
+  const saved = localGet("student");
+  if (saved && state.students.some(s => s.id === saved)) $("student").value = saved;
+  $("lang").value = state.lang;
+  fillFilters(); applyI18n();
+  $("student").onchange = () => { localSet("student", me()); search(); refreshSide(); };
+  $("lang").onchange = () => { state.lang = $("lang").value; localSet("lang", state.lang); applyI18n(); search(); refreshSide(); };
+  $("search").onclick = search;
+  search(); refreshSide();
+  setInterval(refreshSide, 5000);   // notifications appear within 5 s (NFR-P.3)
+})();
+</script>
+</body>
+</html>
