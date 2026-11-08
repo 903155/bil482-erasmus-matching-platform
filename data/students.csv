@@ -1,0 +1,16 @@
+# Demo student profiles for UC2 "Find a Match" (created by UC1 in the full system).
+# id;name;type;department;nativeLanguages;learningLanguages(lang:level);hobbies;sports;availability;matchingEnabled;blockedIds;descriptionLanguage;description
+E01;María García;ERASMUS;Computer Engineering;spanish;turkish:A2,english:C1;photography,cooking,hiking;football,running;weekday-evenings,weekends;true;;es;Me encanta la fotografía y cocinar comida española.
+E02;Lukas Schmidt;ERASMUS;Industrial Engineering;german;turkish:A1,spanish:B1;board games,cinema,cooking;basketball,running;weekends,mornings;true;;en;I like board games and watching European films.
+E03;Giulia Rossi;ERASMUS;Architecture;italian;turkish:A2,english:B2;drawing,photography,museums;swimming,yoga;weekday-evenings;true;;en;Architecture student who loves drawing old buildings.
+E04;Pierre Dubois;ERASMUS;Economics;french;turkish:A1,english:B2,spanish:A2;music,cinema,travel;football,tennis;weekends;true;;en;I play guitar and I want to visit every city in Turkey.
+E05;Anna Kowalska;ERASMUS;Computer Engineering;polish;english:C1,turkish:A1;programming,board games,hiking;volleyball,running;weekday-evenings,weekends;true;;en;Hackathons, hiking and board games are my favourite things.
+E06;Javier López;ERASMUS;Economics;spanish;turkish:B1;cooking,music;football;weekends;true;;es;Quiero practicar turco y enseñar a cocinar paella.
+E07;Sofía Moreno;ERASMUS;Architecture;spanish;;;;weekends;true;;es;
+L01;Emre Yılmaz;LOCAL;Computer Engineering;turkish;spanish:B1,english:B2;photography,hiking,programming;football,running;weekday-evenings,weekends;true;;tr;Fotoğraf çekmeyi ve doğa yürüyüşlerini seviyorum.
+L02;Zeynep Kaya;LOCAL;Architecture;turkish;italian:A2,english:C1;drawing,museums,cinema;yoga,swimming;weekday-evenings;true;;tr;Mimarlık öğrencisiyim, müzeleri ve resim yapmayı seviyorum.
+L03;Mehmet Demir;LOCAL;Industrial Engineering;turkish;german:A2,english:B2;board games,cinema;basketball;weekends,mornings;true;;tr;Kutu oyunları ve basketbol oynamayı seviyorum.
+L04;Elif Şahin;LOCAL;Economics;turkish;french:B1,spanish:A2;music,travel,cooking;tennis;weekends;true;;en;I want to practise French and Spanish before my Erasmus.
+L05;Can Öztürk;LOCAL;Computer Engineering;turkish;english:B2,polish:A1;programming,video games,board games;volleyball,football;weekday-evenings;true;;tr;Yazılım ve voleybol hakkında konuşmayı severim.
+L06;Ayşe Çelik;LOCAL;Economics;turkish;spanish:A1;cooking;running;weekends;false;;tr;
+L07;Burak Arslan;LOCAL;Computer Engineering;turkish;spanish:A2,english:B1;photography,cooking;football;weekends;true;E01;tr;Futbol ve yemek fotoğrafçılığı benim tutkum.
